@@ -1,0 +1,37 @@
+{%extends 'core/base.html'%}
+{%load static%}
+{%block content%}
+
+    <div class="container is-size-1">
+        <div class="columns is-multiline is-tablet is-centered">
+            {% for product in page.object_list %}
+            <div
+                class="column p-1 is-offset-2-mobile is-two-thirds-mobile is-two-thirds-tablet is-half-desktop is-one-third-widescreen is-one-quarter-fullhd">
+                <div class="box m-0">
+                    <a href="{% url 'product' product.category.slug product.slug %}">
+                        <figure class="image is-2by2 mb-4">
+                            <img src="{{ MEDIA_URL }}{{product.image}}">
+                        </figure>
+                    </a>
+                    <p class="subtitle">{{product.title}}</p>
+                    <p class="subtitle">KSh {{product.price}} </p>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        <section class="section">
+        <div class="is-flex is-justify-content-space-between">
+            {% if page.has_previous %}
+            <a class="button is-dark is-rounded" href="{% url 'home-page' %}?page={{ page.previous_page_number}}">
+                < </a>
+                    {% endif %}
+                    {% if page.has_next %}
+                    <a class="button is-dark is-rounded"
+                        href="{% url 'home-page' %}?page={{ page.next_page_number}}">></a>
+                    {% endif %}
+        </div>
+    </section>
+    </div>
+
+{%endblock content%}

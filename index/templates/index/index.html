@@ -1,0 +1,596 @@
+{%block content%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/DRACOLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+  <title>Ibuqa</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+</head>
+
+<body>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="/media/assets/ibuqalogo.png" >
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+
+        <a href="/" class="navbar-item">
+          Home
+        </a>
+
+        <a href="#about" class="navbar-item">
+          About
+        </a>
+
+        <a href="#services" class="navbar-item">
+          Services
+        </a>
+
+        <a href="#pricing" class="navbar-item">
+          Pricing
+        </a>
+
+        <a href="#contact" class="navbar-item">
+          Contact
+        </a>
+
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Landing page image -->
+  <div id="landing-image">
+    <h1 id="main-heading">IBUQA</h1>
+    <img id="rotatingShapePlus1" width="10" height="10" src="/media/assets/plus.png">
+  </div>
+
+  <!-- Information section container -->
+  <section id="about" class="info-container">
+    <h2 class="headings2">
+      ABOUT
+    </h2>
+
+    <p class="heading2description reveal">
+      Ibuqa is a Software As a Service Platform (SaaS) dedicated to providing AI-powered
+      immersive Augmented Reality (AR) Experiences
+    </p>
+    <h2 id="services" class="headings2">
+      SERVICES
+    </h2>
+
+    <p class="heading2description reveal">
+      Ibuqa is a Software As a Service Platform (SaaS) dedicated to providing AI-powered
+      immersive Augmented Reality (AR) Experiences
+    </p>
+
+    <div class="services">
+      <!-- Card 1-->
+      <div class="service-card card reveal">
+        <div class="card-content">
+          <p class="title is-5 service-card-title">
+            VIRTUAL TRY-ON SYSTEM FOR WATCHES
+          </p>
+          <div class="service-card-info">
+            <p style="color:white">
+              Allow your clients to engage with your stunning watch and wrist-wear before purchase.
+            </p>
+            <img class="service-card-image" src="/media/src/images/gold-watch.png">
+          </div>
+        </div>
+        <div class="service-card-footer">
+          <div class="service-card-info" style="justify-content: flex-end;">
+            <button class="service-button"> Live Demo </button>
+          </div>
+        </div>
+      </div>
+      <!--Card 2-->
+      <div class="service-card card reveal">
+        <div class="card-content">
+          <p class="title is-5 service-card-title">
+            VIRTUAL TRY-ON SYSTEM FOR SPECTACLES
+          </p>
+          <div class="service-card-info">
+            <p style="color:white">
+              Allow your clients to engage with your elegant eye-wear, with our API.
+            </p>
+            <img class="service-card-image" src="/media/src/images/glasses.png">
+          </div>
+        </div>
+        <div class="service-card-footer">
+          <div class="service-card-info" style="justify-content: flex-end;">
+            <button class="service-button"> Live Demo </button>
+          </div>
+        </div>
+      </div>
+      <!--Card 3-->
+      <div class="service-card card reveal">
+        <div class="card-content">
+          <p class="title is-5 service-card-title">
+            VIRTUAL TRY-ON SYSTEM FOR FURNITURE
+          </p>
+          <div class="service-card-info">
+            <p style="color:white">
+              Let your clients be immersed in your furniture, with our mobile
+              app solutions.
+            </p>
+            <img class="service-card-image" src="/media/src/images/couch.png">
+          </div>
+        </div>
+        <div class="service-card-footer">
+          <div class="service-card-info" style="justify-content: flex-end;">
+            <!--button  class="service-button"> Live Demo </button-->
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+  </section>
+
+  <section class="contact-container">
+    <h2 id="pricing" class="headings2">
+      PRICING
+    </h2>
+    <div class="service-card-info reveal">
+      <p class="heading2description">
+        We currently offer the best pricing in the industry tailored to your organization needs
+        including a free plan. Please send us an email at <span>info@ibuqa.com</span> and we could get you started at no
+        cost 🥳.
+      </p>
+    </div>
+    <h2 id="contact" class="headings2">
+      CONTACT US
+    </h2>
+    <div class="service-card-info reveal">
+      <p class="heading2description">
+        We would love to hear from you, reach out to us via email:
+        <span>info@ibuqa.com</span>
+      </p>
+    </div>
+  </section>
+
+
+</body>
+<script>
+  const mainheading = document.getElementById("main-heading");
+  const landingImage = document.getElementById("landing-image");
+
+  window.addEventListener('scroll', (e) => {
+    if (root) {
+      root.rotation.y += scrollY / 1500;
+
+    }
+  });
+
+
+  var scene, camera, renderer, sphereCamera, root, color;
+  function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    //scene.background = new THREE.Color(0xffffff);
+    renderer.setClearColor(0xffffff, 0);
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    // let controls = new THREE.OrbitControls(camera, renderer.domElement);
+    // controls.enableZoom = false;
+
+    var drlight = new THREE.DirectionalLight('white', 5);
+    drlight.castShadows = false;
+    drlight.position.set(0, 30, 10);
+    scene.add(drlight);
+
+    var path = "https://threejs.org/examples/textures/cube/SwedishRoyalCastle/";
+    var format = '.jpg';
+
+    var urls = [
+      path + 'px' + format, path + 'nx' + format,
+      path + 'py' + format, path + 'ny' + format,
+      path + 'pz' + format, path + 'nz' + format
+    ];
+
+    let loader = new THREE.CubeTextureLoader();
+    var envMap = loader.load(urls); // callback function is optional
+
+    /// scene.background = loader.load(urls);
+    /* sphereCamera = new THREE.CubeCamera(1,1000,500);
+     sphereCamera.position.set(0,100,0);
+     scene.add(sphereCamera);*/
+    // Metalic material Gold,Silver 
+    
+    let metalicMaterial = new THREE.MeshBasicMaterial({
+      envMap: envMap,
+      transparent: false,
+      opacity: 1,
+      side: THREE.FrontSide,
+    });
+    // Shiny Plastic Material
+    let shinyPlasticMaterial = new THREE.MeshPhysicalMaterial({
+      metalness: 1.0,
+      roughness: 0.3,
+      envMap: envMap,
+      transparent: false,
+      opacity: 1,
+      side: THREE.FrontSide
+    });
+    // Transparent Glass Material
+
+    const options = {
+      enableSwoopingCamera: false,
+      enableRotation: true,
+      transmission: 1,
+      thickness: 0.07,
+      roughness: 0.05,
+      envMapIntensity: 2,
+      clearcoat: 1,
+      metalness: 1,
+      clearcoatRoughness: 0.1,
+      normalScale: 1,
+      clearcoatNormalScale: 0.3,
+      normalRepeat: 1,
+      bloomThreshold: 0.85,
+      bloomStrength: 0.5,
+      bloomRadius: 0.33
+    };
+
+    let glassMaterial = new THREE.MeshPhysicalMaterial({
+      transmission: options.transmission,
+      thickness: options.thickness,
+      roughness: options.roughness,
+      envMap: envMap,
+      envMapIntensity: options.envMapIntensity,
+      clearcoat: options.clearcoat,
+      clearcoatRoughness: options.clearcoatRoughness,
+      normalScale: new THREE.Vector2(options.normalScale),
+      clearcoatNormalScale: new THREE.Vector2(options.clearcoatNormalScale)
+
+    });
+    // Plain plastic material
+    let plasticMaterial = new THREE.MeshStandardMaterial({
+      metalness: 0.8,
+      roughness: 0.2,
+      transparent: false,
+      opacity: 1,
+      side: THREE.FrontSide,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.39,
+    });
+
+    let sphereGeo = new THREE.SphereGeometry(50, 50, 50);
+    let sphere = new THREE.Mesh(sphereGeo, glassMaterial);
+    sphere.position.set(0, 0, -5);
+    scene.add(sphere);
+
+    // Import the glasses 
+    // Create the Draco loader.
+    var dracoLoader = new THREE.DRACOLoader();
+
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+
+    const goader = new THREE.GLTFLoader();
+    goader.setDRACOLoader(dracoLoader);
+
+    goader.load("/media/src/drc/michelangelo_glasses.glb", (gltf) => {
+      root = gltf.scene;
+      let reno = 10;
+      root.traverse((child) => {
+        if (child.isMesh) {
+          // console.log(child.name);
+          // var preMaterial = child.material;
+          // preMaterial.encoding = THREE.sRGBEncoding;
+          // console.log(child.material.color);
+          // color = child.material.color;
+          // child.material = glassMaterial;        
+          // child.material.color.setRGB(color.r,color.g,color.b);
+          if (child.material.isMaterial) {
+            console.log("material name is " + child.material.name);
+            if (child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
+            if (child.material.emissiveMap) material.emissiveMap.encoding = THREE.sRGBEncoding;
+            // console.log(child.material.opacity);
+            let envmat = new THREE.MeshBasicMaterial({ envMap: envMap, transparent: 1, reflectivity: 1, combine: THREE.MultiplyOperation });
+            envmat.map = child.material.map;
+            envmat.color = child.material.color;
+            envmat.opacity = child.material.opacity;
+            child.material = envmat;
+            child.material.needsUpdate = true;
+          }
+          root.renderOrder = -root.renderOrder;
+          console.log(root.name);
+        }
+      });
+      // root.renderOrder = reno++;
+      root.position.set(0, 0, -5);
+      //root.scale.set(2,2,2);
+      scene.add(root);
+    });
+    render();
+  }
+
+  function render() {
+    if (root != undefined) {
+      root.rotation.y += 0.01;
+    }
+    renderer.render(scene, camera);
+    landingImage.append(renderer.domElement);
+    requestAnimationFrame(render);
+  }
+
+  init();
+
+  // Scroll to reveal animation
+  function reveal() {
+    var reveals = document.querySelectorAll(".reveal");
+
+    for (var i = 0; i < reveals.length; i++) {
+      var windowHeight = window.innerHeight;
+      var elementTop = reveals[i].getBoundingClientRect().top;
+      var elementVisible = 30;
+      if (elementTop < windowHeight - elementVisible) {
+        reveals[i].classList.add("active");
+      } else {
+        reveals[i].classList.remove("active");
+      }
+    }
+
+  }
+
+  window.addEventListener("scroll", reveal);
+
+// To check the scroll position on page load
+reveal();
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+  
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+      el.addEventListener('click', () => {
+  
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+  
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+  
+      });
+    });
+  
+  });
+  
+
+</script>
+
+</html>
+<style>
+html {
+  scroll-behavior: smooth;
+}
+
+.navbar-burger >span{
+  color: white;
+}
+
+.navbar-item{
+  color:white !important;
+}
+
+.navbar-item:hover{
+  color: #00113f !important;
+}
+
+#navbarBasicExample{
+  background-color: #00113f;
+
+}
+  /*Scroll animation start*/
+  .reveal{
+    position: relative;
+    transform: translateY(150px);
+    opacity: 0;
+    transition: 1s all ease;
+  }
+  .reveal.active{
+    transform: translateY(0);
+    opacity: 1;
+  }
+  /*Scroll animation end*/
+
+
+  .heading2description {
+    color: white;
+    text-align: center;
+    width: 100%;
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .services {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 10px;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+
+  .service-card-footer {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+  }
+
+  .service-button {
+    float: right;
+    align-self: flex-end;
+    color: white;
+    border: none;
+    width: 150px;
+    height: 50px;
+    margin: 10px;
+    background-color: #00113f;
+    border-radius: 10px;
+  }
+
+  .service-button:hover {
+    background-color: #ffffff;
+    color: #00113f;
+  }
+
+  .service-card-title {
+    color: white;
+  }
+
+  .service-card-info {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .service-card-image {
+    width: 40%;
+    height: auto;
+  }
+
+  .service-card {
+    background: linear-gradient(125deg, #fad106, #e86a03);
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px 0 rgba(246, 245, 245, 0.614), 0 6px 20px 0 rgba(246, 245, 245, 0.614);
+  }
+
+  .headings2 {
+    padding-top: 50px;
+    color: white;
+    font-size: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  #rotatingShapePlus1 {
+    position: relative;
+    top: 30%;
+    left: 70%;
+    animation-name: rotate-anim;
+    animation-duration: 0.8s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+  }
+
+  @keyframes rotate-anim {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  nav {
+    position: fixed !important;
+    width: 100%;
+    top: 0px;
+    background-color: #00113f !important;
+  }
+
+  body {
+    margin: 0px;
+  }
+
+  p {
+    margin: 0px;
+  }
+
+  .info-container::before {
+    content: '';
+    background: linear-gradient(0deg, #000, rgba(0, 0, 0, 0));
+    width: 100%;
+    height: 40%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+  }
+
+  .contact-container::before {
+    content: '';
+    display: block;
+    background: linear-gradient(180deg, #000, rgba(0, 0, 0, 0));
+    width: 100%;
+    height: 100px;
+    left: 0;
+    z-index: 9;
+  }
+
+  .info-container {
+    background-color: #000;
+    color: white;
+    margin: 0px;
+  }
+
+  #main-heading {
+    color: white;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    top: 10%;
+    font-size: 4em;
+  }
+
+  .contact-container {
+    margin: 0px;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-image: url('/media/assets/landing.jpg');
+    background-position: left;
+  }
+
+  #landing-image {
+    margin: 0px;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-image: url('/media/assets/landing.jpg');
+    background-position: left;
+  }
+
+  @media (max-width:900px) {
+    .services {
+      column-gap: 30px;
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<script src="/media/src/index.js"></script>
+
+{%endblock content%}

@@ -1,0 +1,80 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Axlrt</title>
+    <meta name="viewport" content="width=is-size-2, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="{% static 'scripts/three.js' %}"></script>
+    <script src="{% static 'scripts/GLTFLoader.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/16/Stats.min.js"
+        integrity="sha512-by6gRzSfA6HGshqED4Jnc6n/jJ9ojBvjbEbCvsrLzErlIiWswh1qYfYnvSzZg8SmbqVCk/v0XwlpGzJxIDPILw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <nav class="navbar is-dark ">
+        <div class="navbar-brand">
+            <a href="/" class="navbar-item"><strong>Axlrt</strong></a>
+
+            <div class="navbar-start">
+                <form method="get" action="{% url 'search'%}">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input class="input is-rounded" type="text" name="query" placeholder="Search">
+                        </div>
+                      <button class="is-dark" style="padding:0px;margin:0px;" type='submit'>
+                            <span class="button is-dark material-icons">
+                                search
+                            </span>    
+                    </div>
+                </form>
+            </div>
+
+            <a role="button" class="navbar-burger"
+                onclick="document.querySelector('.navbar-menu').classList.toggle('is-active');" aria-label="menu"
+                aria-expanded="false" data-target="main-navbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu" id="main-navbar">
+            <div class="navbar-end">
+                <a class="navbar-item" href="{% url 'cart' %}">
+                    Cart {% if cart %} ({{cart|length}}) {% endif %}
+                </a>
+                <a class="navbar-item" href="{% url 'contact-page' %}">
+                    Contact
+                </a>
+            </div>
+        </div>
+    </nav>
+    {%block content%}
+    {%endblock content%}
+
+    <footer class="footer">
+        <div class="content">
+            {% if request.user.is_authenticated%}
+            <p><a href="{%url 'vendor_admin'%}">Vendor Admin</a></p>
+            {%else%}
+            <p><a href="{%url 'become_a_vendor'%}">Become a Vendor</a></p>
+            {%endif%}
+        </div>
+    </footer>
+
+</body>
+
+</html>

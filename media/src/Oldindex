@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=UTF-8 />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <script src="https://unpkg.com/three@0.143.0/build/three.js"></script>
+    <script src="OrbitControls.js"></script>
+
+<script src="https://unpkg.com/three@0.143.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+      let scene, camera, renderer, sphereCamera,root,color;
+      function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75,window.innerWidth /window.innerHeight,0.1,1000);
+        renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        scene.background = new THREE.Color(0xffffff);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+       // let controls = new THREE.OrbitControls(camera, renderer.domElement);
+       // controls.enableZoom = false;
+        
+        var drlight = new THREE.DirectionalLight('white', 5);
+        drlight.castShadows = false;
+        drlight.position.set(0, 30, 10);
+        scene.add(drlight); 
+          
+        var path = "https://threejs.org/examples/textures/cube/SwedishRoyalCastle/";
+        var format = '.jpg';
+
+
+var urls = [
+    path + 'px' + format, path + 'nx' + format,
+    path + 'py' + format, path + 'ny' + format,
+    path + 'pz' + format, path + 'nz' + format
+];
+        let loader = new THREE.CubeTextureLoader();
+        var envMap = loader.load( urls); // callback function is optional
+         
+        /// scene.background = loader.load(urls);
+       /* sphereCamera = new THREE.CubeCamera(1,1000,500);
+        sphereCamera.position.set(0,100,0);
+        scene.add(sphereCamera);*/
+        // Metalic material Gold,Silver 
+        let metalicMaterial = new THREE.MeshBasicMaterial({
+               envMap: envMap,
+               transparent: false,
+               opacity: 1,
+               side: THREE.FrontSide,           
+        });   
+         // Shiny Plastic Material
+        let shinyPlasticMaterial = new THREE.MeshPhysicalMaterial({
+               metalness:1.0,
+               roughness:0.3,
+               envMap: envMap,
+               transparent: false,
+               opacity: 1,
+               side: THREE.FrontSide
+        });  
+        // Transparent Glass Material
+          
+  const options = {
+    enableSwoopingCamera: false,
+    enableRotation: true,
+    transmission: 1,
+    thickness: 0.07,
+    roughness: 0.05,
+    envMapIntensity: 2,
+    clearcoat: 1,
+    metalness:1,  
+    clearcoatRoughness: 0.1,
+    normalScale: 1,
+    clearcoatNormalScale: 0.3,
+    normalRepeat: 1,
+    bloomThreshold: 0.85,
+    bloomStrength: 0.5,
+    bloomRadius: 0.33
+  };
+          
+    let glassMaterial = new THREE.MeshPhysicalMaterial({
+    transmission: options.transmission,
+    thickness: options.thickness,
+    roughness: options.roughness,
+    envMap: envMap,
+    envMapIntensity: options.envMapIntensity,
+    clearcoat: options.clearcoat,
+    clearcoatRoughness: options.clearcoatRoughness,
+    normalScale: new THREE.Vector2(options.normalScale),
+    clearcoatNormalScale: new THREE.Vector2(options.clearcoatNormalScale)
+ 
+        });
+        // Plain plastic material
+          let plasticMaterial = new THREE.MeshStandardMaterial({
+               metalness: 0.8,
+               roughness: 0.2,
+               transparent: false,
+               opacity: 1,
+               side: THREE.FrontSide,
+               clearcoat: 1.0,
+               clearcoatRoughness: 0.39,
+            });
+          
+        let sphereGeo = new THREE.SphereGeometry(50,50,50);
+        let sphere = new THREE.Mesh(sphereGeo,glassMaterial);
+        sphere.position.set(0,0,-5);
+        scene.add(sphere);
+          
+        // Import the glasses 
+        const goader = new THREE.GLTFLoader();
+        goader.load("rednblack.obj",(gltf)=>{
+        root = gltf.scene;
+
+        root.traverse((child)=>{
+        if(child.isMesh){ 
+            //console.log(child.name);
+         //  var preMaterial = child.material;
+          // preMaterial.encoding = THREE.sRGBEncoding;
+           // console.log(child.material.color);
+          //  color = child.material.color;
+            //child.material = glassMaterial;        
+           
+            //child.material.color.setRGB(color.r,color.g,color.b);
+           
+            if(child.material.isMaterial){
+                console.log("maaterial name is "+child.material.name);
+                if (child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
+            if (child.material.emissiveMap) material.emissiveMap.encoding =
+                THREE.sRGBEncoding;
+                console.log(child.material.opacity);
+                let envmat = new THREE.MeshBasicMaterial({envMap:envMap,transparent:1,reflectivity:1,combine:THREE.MultiplyOperation});
+                envmat.map = child.material.map;
+                envmat.color = child.material.color; 
+                envmat.opacity = child.material.opacity;
+                child.material = envmat;
+                child.material.needsUpdate = true;
+            }
+            root.renderOrder = 2;
+        }
+       });
+       // root.renderOrder = 1;
+        root.position.set(0,0,-5);
+        //root.scale.set(2,2,2);
+        scene.add(root);
+       });  
+        render();
+      }
+      function render() {
+          if(root!=undefined){
+             root.rotation.y += 0.01;  
+          }
+        renderer.render(scene,camera);
+        requestAnimationFrame(render);
+      }
+      init();
+    </script>
+  </body>
+</html>

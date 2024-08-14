@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=is-size-2, initial-scale=1.0">
+
+  <!--HTML 2 CANVAS-->
+  <script src="httpsltg://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+    integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+
+  <!-- Load TENSORFLOW Scripts -->
+  <script src="https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-backend-cpu@2.1.0/dist/tf-backend-cpu.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-backend-wasm@2.1.0/dist/tf-backend-wasm.js"></script>
+
+  <!-- Load MEDIAPIPE Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <!-- Load THREEJS Scripts -->
+  <script src="https://unpkg.com/three@0.120.0/build/three.js"></script>
+  <script src="https://unpkg.com/three@0.120.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!--Draco loader-->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.120.0/examples/js/loaders/DRACOLoader.js"></script>
+  <link rel="stylesheet" href="/media/src/scanstyle.css">
+
+</head>
+
+<body>
+
+  <div id="loaderContainer">
+    <div id="loader"> </div>
+  </div>
+
+  <video id="video" class="input_video" playsinline style="display:none;
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);" muted>
+  </video>
+  
+
+  <div id="infoAnimContainer">
+  <svg id="infoSvg" width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 452.49 528.39"><defs><style>.cls-1{fill:none;stroke:#00e7d0;stroke-miterlimit:10;}</style></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_2-2" data-name="Layer 2"><path class="cls-1" d="M111.93,409.92l-16-16,24,9-8,7,20,5,31,27,32.5,1.74,22.5,4.26,18-3-4,22-14-19,2.3,18.85-24.8-23.11,9.5,27.26-42-29-51-32,9,25-11-8v8.53l-14-41.56,25,41,42,7,3,29-45-36,6,34v-3l-17-39v36.62l19,48.35-2-43,40.7,2-38.7,41,38.53,6.27,35.64-47.27H165.93v47l39,7-2-59,17,59,.32-61.35,6.68,57.35,5-54-10,1-17,3h-39s-38-2-39-2-17-5.35-17-5.35v43.35l19,5"/><polygon class="cls-1" points="119.93 402.92 137.93 404.92 129.93 412.92 119.93 402.92"/><polygon class="cls-1" points="137.93 404.92 164.07 404.92 155.93 415.92 137.93 404.92"/><polyline class="cls-1" points="131.93 414.92 131.93 414.92 155.93 414.92 162.93 441.92 191.93 425.92 197.49 444.05 217.93 447.92 191.93 425.92 219.93 432.92 217.93 447.92 235.93 444.92 238.93 433.92 219.93 432.92 235.93 444.92"/><path class="cls-1" d="M95.93,395.22c0-1.48-1.24-6.13-2.12-9.27-.14-.48-.26-.92-.38-1.31l-.5-1.72,13-11,13.47,29.83.53,1.17L93.81,386"/><polygon class="cls-1" points="86.93 351.92 88.93 367.92 95.19 369.39 86.93 351.92"/><path class="cls-1" d="M94.82,368.62l-1.89-16.7h-6l-1-19,7,19v-19l12,16V331l14.88,23.1,3.12-20.13,20,20V334.86l25,20.06,3-19,8.5,20.63H198l16.21-7.63,17.72,3h18.9l13.87-3,11.23-6,5-3,4-2,11-6,8,6-2.61,22.73-5.39-28.73,1.12,32.55-12.12-26.55,7.85,26.55-11.85-24.55v37l-5-34q-5,22-10,44l-1.23-38-11.77,42-2.1-39-23.11,39,4.21-39-4.21,39-13.51-42-.28,44L198,356.55H184.78l-1.85,27.37,8,3.5,1.17.28,21.83,5.22,13.79-2h25.21l13-4,15-10,11.85-12.45h4.27l4.27-3.82,9.95-5.73q-3.67-8.51-7.34-17"/><polygon class="cls-1" points="238.93 433.92 245.5 424.92 231.93 422.92 238.93 433.92"/><polyline class="cls-1" points="219.93 432.92 203.63 412.92 231.93 422.92 192.96 424.92 203.63 412.92 164.07 404.92"/><polygon class="cls-1" points="165.93 381.44 203.63 412.92 182.93 383.92 165.93 381.44"/><polygon class="cls-1" points="167.93 354.92 165.93 380.02 143.9 354.92 144.96 380.02 119.93 353.08 116.93 376.92 104.93 348.92 105.93 371.92 92.93 351.92 104.93 348.92 119.93 353.08 143.9 354.92 167.93 354.92"/><polygon class="cls-1" points="182.93 383.92 167.93 354.92 179.43 356.55 182.93 383.92"/><polygon class="cls-1" points="245.5 424.92 264.16 404.92 283.89 392.92 311.27 375.22 319.1 367.92 337.76 360.27 301.32 360.65 319.1 367.92 297.05 364.47 314.59 372.12 311.36 371.58 289.5 367.92 280.71 376.7 311.36 371.58 283.89 392.92 280.71 376.7 268.06 389.36 283.89 392.92 264.16 404.92 264.16 387.42 252.93 390.92 264.16 404.92 245.35 410.42 245.5 424.92"/><polyline class="cls-1" points="252.93 390.92 245.35 410.42 227.72 390.92 224.16 407.92 245.35 410.42 231.93 422.92 224.16 407.92 212.43 412.92 231.93 422.92"/><polyline class="cls-1" points="227.72 390.92 212.43 406.92 224.16 407.92"/><polygon class="cls-1" points="213.93 392.92 212.43 406.92 203.63 402.92 213.93 392.92"/><polyline class="cls-1" points="190.93 387.42 203.63 402.92 203.63 412.92"/><polyline class="cls-1" points="203.63 402.92 212.43 412.92 203.63 406.92"/><line class="cls-1" x1="212.43" y1="406.92" x2="212.43" y2="412.92"/><polyline class="cls-1" points="179.43 356.55 182.93 332.37 185 357.49 188.93 331.92 198 356.55 192.1 387.7 184.78 356.55"/><polygon class="cls-1" points="198 356.55 201.94 321.46 212.43 326.86 198 356.55"/><polyline class="cls-1" points="231.85 350.99 246.93 312.88 252.93 351.88 266.93 305.88 264.69 348.88 282.93 306.88 278.78 341.17 291.56 306.92 282.75 338.97 295.93 307.88 287.19 336.65 300.93 309.88 295.93 331.88 306.93 313.88 303.93 337.88 330.93 307.88 307.93 313.88 300.85 310.21 295.93 307.88 291.56 306.92 282.93 306.88 266.93 305.88 246.93 312.88 228.93 315.88 231.93 351.88 214.93 347.88 227.72 315.63 212.43 326.83 214.21 348.88"/><line class="cls-1" x1="229.93" y1="315.92" x2="227.72" y2="315.66"/><polygon class="cls-1" points="201.94 321.46 188.93 331.92 182.93 332.37 170.93 335.92 142.93 335.31 122.93 333.92 104.93 330.95 92.93 332.92 85.93 332.92 84.43 313.59 92.93 332.92 92.93 313.59 104.93 330.95 106.43 313.59 122.93 333.92 124.16 313.59 142.93 335.31 143.18 313.59 170.93 335.92 174.29 315.92 182.93 332.37 195.43 306.95 190.93 330.31 216.93 281.92 201.94 321.46"/><polyline class="cls-1" points="303.93 337.88 330.93 321.46 330.93 307.88 334.93 299.92 321.31 302.51 307.93 313.88 300.93 309.88 313.93 303.92 334.93 299.92 350.93 290.92 357.93 288.92 368.93 284.92 389.93 274.92 410.93 266.92 433.93 267.92 448.93 274.92 451.93 278.92 448.93 286.92 443.93 292.92 432.16 299.92 417.93 299.92 414.93 303.92 405.93 310.92 399.36 315.92 388.93 326.92 382.03 330.95 368.93 336.92 337.76 360.27"/><path class="cls-1" d="M311.27,354.92l29.13,3.37L349,335.92l-37.69,19,19.66-33.46,18,14.46,16-25-34,10.54,15.2-27.84,18.8,17.3q-4-9.51-8-19l13.1,14-6.1-18,15,13q-3.49-8.51-7-17l30,5-15.47-12.35,23.47-4.65c.33-1.67.67-3.34,1-5"/><polygon class="cls-1" points="348.96 335.92 350.29 335.32 377.93 322.92 368.93 336.92 348.96 335.92"/><polyline class="cls-1" points="409.93 271.92 434.93 274.92 443.93 282.92 409.93 271.92 431.64 267.82 434.93 274.92 450.04 276.4 443.93 282.92 413.93 284.92 409.93 271.92 401.93 288.92 378.93 300.92 370.03 305.88 364.93 310.92 377.93 322.92 378.93 330.92 385.76 321.46 387.5 327.75 389.93 316.92 394.11 321.46 385.76 321.46 382.3 313.59 377.93 322.92"/><polyline class="cls-1" points="414.93 303.92 413.93 299.37 405.93 310.92 394.93 308.92 413.93 299.37 417.93 299.92 429.93 291.92 443.93 292.92 443.93 282.92 429.93 291.92 416.69 284.73 413.93 299.37 401.93 288.92 413.93 284.92"/><polyline class="cls-1" points="401.93 288.92 394.93 308.92 378.93 300.92"/><polyline class="cls-1" points="364.93 310.92 382.3 313.59 370.03 305.88 394.93 308.92 394.11 321.46"/><line class="cls-1" x1="382.3" y1="313.59" x2="394.93" y2="308.92"/><polyline class="cls-1" points="201.94 321.46 234.93 292.92 213.93 325.73"/><polyline class="cls-1" points="170.93 335.92 169.76 315.92 143.16 315.66 124.16 313.59 106.43 313.59 92.93 313.59 84.43 313.59 84.43 294.15 92.93 313.59 92.93 292.92 106.43 313.59 106.03 292.92 124.16 313.59 126.03 292.92 143.16 315.66 139.93 295.48 169.76 315.92 173.76 313.59 188.71 305.88 182.93 330.95"/><polyline class="cls-1" points="228.93 315.88 234.93 292.92 246.93 312.88 246.93 285.62 266.93 305.88 266.93 272.55 280.69 267.82 265.82 304.76 284.43 281.92 289.93 295.92 265.82 304.76 282.93 304.76 289.93 295.92 295.93 296.92 303.1 292.92 308.93 297.92 313.93 303.92 295.93 296.92 282.93 304.76"/><polyline class="cls-1" points="291.56 306.92 303.29 299.78 310.14 299.37"/><polyline class="cls-1" points="95.19 369.39 92.93 382.92 88.93 367.92 105.93 371.92 116.93 376.92 119.93 402.92 137.93 404.92 116.93 376.92 144.93 381.92 137.93 404.92 164.07 404.92 144.93 381.92 165.93 381.44 164.07 404.92 190.93 424.92 155.93 415.92"/><polyline class="cls-1" points="169.76 315.92 160.93 296.92 139.93 295.48 125.92 294.15 106.03 292.92 92.93 292.92 84.43 294.15 90.93 258.92 92.93 292.92 107.93 255.92 104.93 282.92 92.93 292.92"/><polyline class="cls-1" points="160.93 296.92 173.93 295.92 173.76 313.59"/><polygon class="cls-1" points="188.71 305.88 173.93 295.92 208.93 279.92 188.71 305.88"/><polyline class="cls-1" points="208.93 279.92 195.43 306.95 188.71 305.88"/><polyline class="cls-1" points="216.93 281.92 220.25 278.92 234.93 291.85 234.93 262.86 246.93 285.62 234.93 291.85"/><polygon class="cls-1" points="288.93 280.92 289.93 295.92 295.93 286.92 288.93 280.92"/><polyline class="cls-1" points="303.1 292.92 295.93 286.92 291.56 270.92 288.93 280.92 284.83 282.93 280.69 267.82"/><line class="cls-1" x1="261.93" y1="250.92" x2="278.93" y2="252.92"/><line class="cls-1" x1="280.7" y1="270.92" x2="290.33" y2="275.56"/><path class="cls-1" d="M291.56,252.19l-2.63-36.44q-5,18.58-10,37.17l1.77-37.17q-9.39,17.58-18.77,35.17.66-10.26,1.31-20.5l17.46-14.67h-20l2.54,14.67-20.31-12.5v13l20.31-.5"/><polyline class="cls-1" points="204.96 524.92 219.93 526.92 226.93 521.92"/><polyline class="cls-1" points="244.93 257.92 245.23 250.92 262.24 246.02 242.93 230.92 245.23 250.92"/><polyline class="cls-1" points="242.93 230.92 228.93 233.53 234.93 262.86 218.04 267.17 232.96 257.92 195.43 244.55 218.04 267.17 219.36 270.92 209.93 278.92 216.93 281.92 195.43 306.95"/><polyline class="cls-1" points="104.93 282.92 124.93 285.92 124.93 253.92 104.93 282.92 105.23 293.43 124.93 285.92 126.03 292.92 139.93 286.92 139.93 295.48 155.93 287.92 159.98 295.92 170.93 288.92 173.93 295.92 216.93 268.28 170.93 288.92 170.93 288.92 173.93 252.02 155.93 287.92 157.93 254.92 139.93 286.92 137.93 254.92 124.93 285.92"/><polyline class="cls-1" points="84.43 294.15 75.93 261.92 90.93 258.92 107.93 255.92 124.93 253.92 137.93 254.92 157.93 254.92 173.93 252.02 195.43 244.55 171.03 287.72"/><polygon class="cls-1" points="228.93 233.53 195.43 244.55 228.93 220.37 228.93 233.53"/><polyline class="cls-1" points="75.93 261.92 72.93 247.92 90.93 258.92 90.93 244.55 107.93 255.92 109.93 242.92 124.93 253.92 127.09 232.46 136.57 254.81 136.57 230.92 156.69 254.92 156.69 230.92 173.93 252.02 173.93 230.92 193.76 244.55 193.76 226.95 195.43 226.67 227.72 221.25 214.93 202.92 193.76 226.95 176.93 200.92 173.93 230.92 158.93 202.92 156.69 230.92 136.57 230.92 127.09 217.88 127.09 232.46 109.93 242.92 107.93 226.92 127.09 232.46"/><polygon class="cls-1" points="72.93 247.92 109.67 240.87 89.76 232.46 90.93 244.55 70.93 234.92 72.93 247.92"/><polyline class="cls-1" points="70.93 234.92 64.93 225.92 90 234.92 72.93 234.92"/><polyline class="cls-1" points="193.76 226.95 191.43 200.92 176.93 200.92 158.93 202.92 135.68 204.73 136.57 211.92 158.93 202.92 136.57 230.92 136.57 211.92 127.09 220.37 107.93 226.92 127.09 211.92 102.93 217.92 107.93 226.92 87.93 211.92 79.09 225.92 107.93 226.92 89.76 232.46 79.09 225.92 64.93 225.92 43.93 189.92 34.93 178.92 32.96 174.47 30.83 167.75 14.56 133.42 7.36 114.13 2.83 100.35 0.93 90.92 8.43 83.7 14.93 80.92 21.93 82.92 32.93 95.92 43.9 114.13 48.93 121.92 48.7 127.92 52.96 133.42 60.96 146.92 67.36 157.92 70.93 161.08 82.93 186.92 92.93 204.92 102.93 217.92"/><line class="cls-1" x1="237.67" y1="202.92" x2="242.93" y2="217.92"/><polyline class="cls-1" points="156.69 230.92 173.93 230.92 195.43 226.67"/><line class="cls-1" x1="127.1" y1="232.46" x2="136.57" y2="230.92"/><polyline class="cls-1" points="127.09 218.95 126.16 212.15 136.57 211.92"/><polyline class="cls-1" points="191.43 200.92 190.93 192.92 212.96 195.92 190.93 201.48"/><polygon class="cls-1" points="214.93 202.92 212.93 196.92 233.23 197.2 214.93 202.92"/><polygon class="cls-1" points="233.9 197.2 234.27 197.77 237.67 202.92 250.69 202.92 250.16 197.2 233.9 197.2"/><polyline class="cls-1" points="234.27 197.77 249.76 202.92 260.69 215.75 242.93 217.92 228.93 220.37 242.93 230.92 234.93 262.86 219.36 270.92 220.25 278.92 234.93 262.86 244.93 257.92 246.93 285.62 266.93 273.35 244.93 257.92 261.93 250.92 266.93 273.35 278.93 252.92 278.93 267.82 291.56 252.19 278.93 252.92 291.56 270.92 291.56 252.19"/><line class="cls-1" x1="237.67" y1="202.92" x2="260.7" y2="215.75"/><polyline class="cls-1" points="190.93 192.92 165.93 193.92 152.93 195.92 176.06 201.01 165.93 193.92 191.43 200.92 214.93 202.92 237.67 202.92 227.72 221.25"/><polyline class="cls-1" points="250.27 203.51 264.93 210.92 267.93 207.92 250.69 197.2 271.36 197.77 274.03 202.92 267.93 207.92 288.93 215.75 280.69 215.75 264.93 210.92 261.14 215.75"/><polygon class="cls-1" points="288.93 215.75 274.03 202.92 289.85 197.77 288.93 215.75"/><polyline class="cls-1" points="288.93 215.75 294.93 202.92 289.85 197.77 296.93 181.92 294.93 202.92 301.93 182.92 296.75 182.31 299.93 171.92 303.93 175.92 301.93 182.92"/><polyline class="cls-1" points="299.93 171.92 301.93 163.92 303.93 175.92 306.65 169.92 301.93 163.92 308.43 163.92 303.18 158.67 309.93 153.92 305.93 152.92 314.93 124.92 316.93 116.92 316.93 103.04 320.93 99.92 319.93 91.92 324.93 76.92 313.93 65.92 324.93 68.02 326.93 48.92 322.93 38.92 314.3 38.92 304.93 41.92 295.93 54.92 292.93 72.92 287.93 86.92 286.93 94.92 283.93 99.92 277.93 117.92 268.93 136.92 266.93 146.92 264.93 154.92 262.93 162.92 258.93 178.92 256.93 183.92 250.16 197.2 274.03 192.92 269.6 197.2 288.55 197.77 274.03 192.92 280.93 174.92 288.93 195.92 299.93 184.92 280.93 174.92 256.93 183.92 274.03 192.92"/><polyline class="cls-1" points="304.93 41.92 318.3 48.92 326.93 48.92 324.93 76.92 320.93 99.92 317.5 118.06 310.93 153.92 308.43 163.92 306.65 169.92"/><polyline class="cls-1" points="305.93 42.44 307.93 48.92 315.93 47.68 299.93 62.92 303.93 45.08"/><polyline class="cls-1" points="307.93 48.92 299.93 62.92 296.93 72.92 294.93 60.92"/><polyline class="cls-1" points="313.93 65.92 299.93 64.82 312.29 74.92 296.43 74.92 293.43 87.75 312.29 74.92"/><polyline class="cls-1" points="293.43 87.75 305.93 93.08 293.43 98.68 305.93 100.28 301.93 110.92 293.43 98.68 285.93 111.92 301.93 110.92"/><polyline class="cls-1" points="289.85 145.88 269.6 150.68 274.03 135.22 289.85 145.88 285.93 111.92 286.26 96.03 293.43 98.68"/><polygon class="cls-1" points="284.93 158.92 269.6 150.68 269.6 157.08 284.93 158.92"/><line class="cls-1" x1="318.3" y1="48.92" x2="324.93" y2="68.02"/><polyline class="cls-1" points="324.93 76.92 312.29 74.92 319.93 91.92 307.93 93.62 315.93 101.99 316.93 103.04 301.93 110.92 305.13 100.05 311.93 76.92 313.93 65.92 318.3 48.92 320.16 38.92"/><line class="cls-1" x1="303.93" y1="99.83" x2="316.93" y2="103.04"/><line class="cls-1" x1="316.93" y1="116.92" x2="301.93" y2="110.92"/><polyline class="cls-1" points="292.93 72.92 294.09 87.3 288.55 87.75 293.43 98.68 294.09 88.03"/><line class="cls-1" x1="279.5" y1="113.22" x2="276.77" y2="129.86"/><polyline class="cls-1" points="285.93 111.92 274.03 135.22 268.44 139.35 269.6 150.68 264.93 154.92 267.93 161.92 267.24 168.11 261.79 167.47 261.79 181.26 267.24 168.11 280.93 174.92 297.95 178.39 284.93 164.92 298.83 169.92 284.93 158.92 298.83 164.28 303.11 160 284.93 158.92 289.85 145.88 302.91 158.94 305.93 152.92 289.85 145.88 301.93 110.92 305.93 152.92"/><polyline class="cls-1" points="285.19 158.21 284.93 164.92 280.93 174.92 267.93 161.92 284.93 164.92"/><line class="cls-1" x1="267.93" y1="161.92" x2="269.6" y2="156.02"/><polyline class="cls-1" points="233.9 197.2 230.56 189.97 230.56 181.26 233.9 150.68 237.67 134.68 237.67 110.92 237.67 79.22 240.3 64.82 242.93 52.68 244.93 33.92 242.93 21.62 240.3 7.75 233.23 2.77 224.93 0.92 215.93 2.92 208.93 6.92 204.93 25.92 201.94 42.44 201.94 60.92 198.92 72.92 196.93 83.92 195.43 103.04 193.76 113.22 190.93 129.85 190.93 137.88 190.93 146.09 188.93 155.92 188.93 166.57 188.93 179.48 186.47 189.97 183.63 193.83"/><polyline class="cls-1" points="230.56 185.17 225.58 171.92 233.23 154.8 230.93 137.92 233.23 129.85 237.67 123.35 237.67 110.92 221.32 76.28 235.93 82.92 233.9 62.92 240.3 62.92 242.29 55.6 235.9 52.68 235.93 36.92 242.29 55.6"/><polyline class="cls-1" points="208.93 6.92 224.16 6.92 224.93 0.92 233.54 7.4 235.93 26.92 224.16 8.46"/><polyline class="cls-1" points="242.93 31.93 234.93 27.92 235.93 36.92 242.93 31.93 242.93 21.62 235.93 26.92 240.3 7.75 224.16 6.92 222.43 31.57 221.32 38.92 221.32 58.47 221.32 64.82 221.32 76.28 217.93 109.92 235.93 116.92 217.93 116.92 235.93 123.35 217.93 123.35 233.23 129.85 217.93 132.19 230.93 137.92 214.28 137.92 233.23 154.8 215.98 154.8 225.58 171.92 212.96 171.92 227.94 185.17 212.96 181.26 214.28 189.97 230.21 192.92 212.96 181.26"/><path class="cls-1" d="M235.93,27.62l-13.5,3.95,13.5,6-14.61,1.3,14.61,14.3-14.61,5.25L234,64.23H221.9l16,20.69"/><polyline class="cls-1" points="235.93 53.22 233.9 62.92 241.87 57.15"/><line class="cls-1" x1="232.88" y1="131.06" x2="237.24" y2="136.51"/><polyline class="cls-1" points="212.96 6.92 204.14 30.3 222.43 6.92"/><polyline class="cls-1" points="222.43 31.57 204.14 31.35 206.93 40.92 221.32 38.92 207.63 31.35 222.43 7.48"/><polyline class="cls-1" points="221.32 38.92 205.36 53.22 221.32 58.47 205.36 61.35 221.32 63.48 220.93 76.92 204.93 60.92"/><polyline class="cls-1" points="206.93 40.92 205.36 53.22 201.94 55.27"/><line class="cls-1" x1="205.36" y1="53.22" x2="203.02" y2="78.82"/><polyline class="cls-1" points="194.96 109.92 197.93 113.92 199.93 122.15"/><line class="cls-1" x1="212.96" y1="171.92" x2="193.76" y2="174.15"/><polyline class="cls-1" points="199.93 120.92 192.56 120.31 199.93 125.92 199.93 120.92 217.38 110.03 197.93 113.92 203.02 78.82 218.72 110.22"/><polyline class="cls-1" points="199.93 125.92 191.23 128.09 199.93 131.92 191.23 137.22 197.93 139.92 193.76 156.55 192.93 173.75 192.93 182.92 213.11 182.28"/><polyline class="cls-1" points="197.93 139.92 191.23 146.82 194.3 154.42 189.93 159.92 192.93 173.75 187 187.7 192.93 182.92 190.93 192.15 214.05 188.93 192.69 189.97 213.11 182.28 193.76 174.15 215.98 154.8 194.69 156.02 215.35 138.87 197.93 139.92 199.93 131.92 216.93 131.92 216.93 123.35 200.29 131.06 199.93 125.92 216.93 123.35 199.93 120.92 217.93 116.92 217.93 109.92 217.93 116.92 217.93 123.35 216.93 131.92 215.35 138.87 215.98 154.8 213.86 172.71 212.96 181.26 214.28 190.55 212.96 195.92"/><polyline class="cls-1" points="220.93 76.92 203.02 78.82 199.93 68.91"/><line class="cls-1" x1="197.55" y1="80.46" x2="199.73" y2="101.5"/><path class="cls-1" d="M123.36,26.92l-12.43,2,16,12-10.5,7.17,12.5,1.83L116.7,56.27l18.23,12.65-12.58,3.9,12.58,3.1-12.58,2.9L136.16,91H123.54l20.62,25.55-12.8,6.82,17.87,2.57-15.3,4,13.7,1.14-12.27,5.45H151.1l-16.17,5.41,18.48,2.34-16.48,2.66,18.62,9.1-12.72,5.9,11.2,13-4.8,10.25h8.27l7.2,7.75-7.77-30-3-15-3-21-6-12L141.5,96l-3.74-15.56-1.6-11.55-5.33-15.69-3.2-12.3-4.27-14-7.46-6h-7l-8,2L90,30.3l2.4,17.79.5,12.83,4,17.9,3.2,17.2,5.77,33.9,1,8,1.77,8.17,1.33,6.83,2.4,9,3.2,13,3.3,12,7.23,25.23,10.41-7.49,16.36-8.74,6.5,6.5"/><polyline class="cls-1" points="155.55 156.02 154.03 174.92 164.69 192.92"/><polyline class="cls-1" points="108.93 20.92 110.93 28.92 116.43 48.09 116.69 56.27 122.34 72.82 122.34 78.82 123.55 90.98 131.36 123.35 133.93 129.92 135.36 136.51 134.93 141.92 136.93 146.92 142.83 161.92 143.93 175.92 154.03 174.92"/><polygon class="cls-1" points="111.93 127.92 105.81 129.25 115.93 136.92 106.93 137.92 117.93 142.92 108.69 146.09 119.93 147.92 110.03 152.92 118.93 157.92 112.43 161.92 123.93 168.92 115.9 175.92 126.16 191.22 126.16 212.15 131.48 201.48 126.16 191.22 123.93 168.92 118.93 157.92 119.93 147.92 117.93 142.92 115.93 136.92 111.93 127.92"/><path class="cls-1" d="M90,30.3l11.64,17.79,9.26-19.17h-17l6.55,3.72,1.19,15.45-8.74-3.17,8,13-7-3L104.7,73.86l-8.39,2.07,11.62,6-10.25.76,10.57,16.38,3.68,28.86L97.68,82.68"/><line class="cls-1" x1="100.48" y1="32.64" x2="110.93" y2="28.92"/><polyline class="cls-1" points="116.43 48.09 101.67 48.09 116.69 56.27 101.85 57.92 104.69 73.86 122.34 72.82 107.93 81.92 122.34 78.82 123.46 90.09 107.93 81.92 108.25 99.06 123.55 90.98"/><polyline class="cls-1" points="108.42 100.35 131.48 124.37 111.93 127.92"/><polyline class="cls-1" points="149.23 185.17 131.48 201.48 143.93 175.92"/><polyline class="cls-1" points="126.16 212.15 157.5 185.17 151.72 196.56 149.23 185.17 143.93 175.92 126.16 191.22 142.83 161.92 123.93 168.92 136.93 146.92 119.93 147.92 135.36 136.51 115.93 136.92 131.36 123.35"/><polyline class="cls-1" points="130.22 50.88 132.64 68.08 132.64 76.05 136.16 90.98 144.16 116.53"/><line class="cls-1" x1="133.93" y1="129.92" x2="115.93" y2="136.92"/><polyline class="cls-1" points="117.93 142.92 135.36 136.51 135.36 141.22 119.93 147.92"/><line class="cls-1" x1="136.93" y1="146.92" x2="118.93" y2="157.92"/><path class="cls-1" d="M1.08,91.66l12.85-6.74-1.42-3,6.32,9.71,6.1,11.26,3,9,8.32,16,.46,1,7.22,15,8,12.77,1,5.23,4,3,5,10,7,12,7.32,14.56,2.68,3.44,9,7V197.08l-9,7.84-2.68-3.44,10-10-17.36-4.52,11.22-6-19.36-8.29,10.14-7.72-12.58,2.83,9.58-4.83-11,2,7-9-12,6,9-10-9,4.77q3.51-5.88,7-11.77l-15.82-2.7,9.82-6.3-13.55-1.47,8.25-6.53-11.89-1,11.19-6-19-9,8-10-11,1,8-7L15.25,86.16l6.68-3.24"/><polyline class="cls-1" points="13.93 84.92 13.64 85.79 10.93 93.92 1.27 92.62 13.93 106.82 13.93 84.13"/><line class="cls-1" x1="27.66" y1="111.12" x2="22.56" y2="132.82"/><polyline class="cls-1" points="13.93 106.82 4.48 105.38 15.93 114.92 13.93 106.82 11.12 93.36"/><polyline class="cls-1" points="15.93 114.92 7.6 113.08 22.56 133.42 15.93 114.92 27.66 111.12 13.93 106.82 24.93 102.92"/><polyline class="cls-1" points="23.38 135.07 15.93 135.07 26.93 140.92 18.39 141.5 31.46 151.3 22.09 149.31 51.9 156.69"/><line class="cls-1" x1="26.93" y1="140.92" x2="30.58" y2="151.12"/><polyline class="cls-1" points="22.56 151.12 36.93 166.92 31.55 170.03 41.93 171.92 33.91 175.92 45.76 175.92 36.74 181.13 47.93 179.75 40.92 186.24 47.93 185.92 43.93 189.92 55.9 197.2 47.93 185.92"/><polyline class="cls-1" points="65.89 225.92 68.96 218.22 59.25 216.18 64.93 210.42 52.65 204.87 55.9 197.2 64.93 210.42 68.96 218.22 77.46 225.92 78.93 204.92 68.69 218.95 75.09 201.48 64.93 210.42 68.93 186.92 55.9 197.2 60.79 172.64 47.93 185.92 47.93 179.75 56.93 164.92 45.76 175.92 41.93 171.92 52.14 157.92 36.93 166.92 30.03 152.42 43.11 142.22 26.93 140.92 38.89 133.42 36.25 127.92 26.93 142.22 22.56 133.42 36.25 127.92"/><polyline class="cls-1" points="235.93 82.92 235.93 116.92 235.93 124.55 232.88 138.68 232.88 152.92"/></g></g></svg>
+    <h2 id="infoText"></h2>
+  </div>
+
+  <div class="column is-offset-0" id="canvcontainer" style="width:100%;text-align:center;">
+    <!-- SVG CONTAINER END -->
+    <h2 style="position:absolute;top:40%;width:100%;text-align:center;padding: 0px;margin:0px;">
+    </h2>
+
+  </div>
+  <!-- DOWNLOAD IMAGE SECTION -->
+  <div id="camera-icon"> </div>
+  <!-- LOAD MODELS SECTION WITH MODEL IMAGES-->
+  <div id="modelsSection" style="width:100%"></div>
+
+</body>
+
+<script>
+
+  const videoElement = document.getElementsByClassName('input_video')[0];
+
+  let model, ctx, videoWidth, videoHeight, video, canvas;
+  // Global variables
+  var devicewidth;
+  var deviceheight;
+  var deviceRatio = 0.5;
+  var aspectRatio;
+  var virtualCanvas;
+  var canvasMaterial;
+  var virtualCanvasContext;
+
+  var deviceRatio = 1;
+  var deviceMaxWidth = window.matchMedia("(max-width: 700px)");
+  if (deviceMaxWidth.matches) {
+    deviceRatio = 0.9;
+  } else {
+    deviceRatio = 0.6;
+  }
+
+  // Helper functions    
+  function mapcoords(canvx, canvy) {
+    let scenex = devicewidth / 2;
+    let sceney = deviceheight / 2;
+    let newx = canvx - scenex;
+    let newy = sceney - canvy;
+    return [newx, newy];
+  }
+
+  // Camera setup function
+
+  // DECLARE THREE JS VARIABLES
+  var plane;
+  var cameradistance;
+  var fieldofview;
+  var scene;
+  var vidMaterial;
+  var vidTexture;
+  var camera;
+  var renderer;
+  var root;
+  var occluder;
+  var envMap;
+  var canvcontainer;
+  var drlight;
+  var omaterial;
+  var oader;
+
+  var meshWidth = 1;
+  var vidloaded = false;
+
+  var modeldata = {
+    modelPositionX: 0, modelPositionY: 0, modelPositionZ: 0,
+    modelScaleX: 5, modelScaleY: 5, modelScaleZ: 5,
+    modelRotationX: 0, modelRotationY: 180, modelRotationZ: 0,
+    occluderPositionX: 0, occluderPositionY: 0, occluderPositionZ: 0,
+    occluderScaleX: 6, occluderScaleY: 0.7, occluderScaleZ: 0.3,
+    occluderRotationX: 0, occluderRotationY: 180, occluderRotationZ: 0,
+  };
+
+  var loadedModels = [
+    {
+      id: 'goldwatch',
+      modelImage: '/media/uploads/images/goldwatch.png',
+      modelFile: '/media/src/drc/watch2.glb',
+      modelPositionX: 0, modelPositionY: 0, modelPositionZ: 0,
+      modelScaleX: 5, modelScaleY: 5, modelScaleZ: 5,
+      modelRotationX: 0, modelRotationY: 180, modelRotationZ: 0,
+      occluderPositionX: 0, occluderPositionY: 0, occluderPositionZ: 0,
+      occluderScaleX: 6, occluderScaleY: 0.7, occluderScaleZ: 0.3,
+      occluderRotationX: 0, occluderRotationY: 180, occluderRotationZ: 0,
+    },
+    {
+      id: 'blackwatch',
+      modelImage: '/media/uploads/images/blackwatch.png',
+      modelFile: '/media/src/drc/blackwatch.glb',
+      modelPositionX: 0, modelPositionY: 0, modelPositionZ: 0,
+      modelScaleX: 8, modelScaleY: 8, modelScaleZ: 8,
+      modelRotationX: 0, modelRotationY: 180, modelRotationZ: 0,
+      occluderPositionX: 0, occluderPositionY: 0, occluderPositionZ: 0,
+      occluderScaleX: 6, occluderScaleY: 0.7, occluderScaleZ: 0.3,
+      occluderRotationX: 0, occluderRotationY: 180, occluderRotationZ: 0,
+    }
+  ];
+
+
+  const modelsSection = document.querySelector('#modelsSection');
+
+  for (let o of loadedModels) {
+
+    const modelToLoad = document.createElement('div');
+
+    modelToLoad.className = "modelImage card";
+
+    modelToLoad.addEventListener('click', function (e) {
+      load3DModel(o);
+    });
+
+    modelToLoad.style.backgroundImage = `url('${o.modelImage}')`;
+
+    modelsSection.append(modelToLoad);
+
+  }
+
+  // Class to manage loading screen
+  class Loader {
+
+    #loaderElement = null;
+    #infoScreenElement = null;
+    #infoScreenText = null;
+    #infoScreenVisible = false;
+
+    constructor(loaderElement, infoScreenElement, infoScreenText) {
+      this.#loaderElement = loaderElement;
+      this.#infoScreenElement = infoScreenElement;
+      this.#infoScreenText = infoScreenText;
+    }
+
+    // Info Screen Methods
+    isInfoScreenVisible() {
+      return this.#infoScreenVisible;
+    }
+
+    showInfoScreen(message) {
+      this.#infoScreenElement.style.display = "block";
+      this.#infoScreenText.innerHTML = message;
+      this.#infoScreenVisible = true;
+    }
+
+    closeInfoScreen() {
+      this.#infoScreenElement.style.display = "none";
+      this.#infoScreenVisible = true;
+    }
+
+    // Loading Screen Methods
+    start() {
+      this.#loaderElement.style.display = "block";
+    }
+
+    stop() {
+      this.#loaderElement.style.display = "none";
+    }
+
+  }
+
+  const loaderElement = document.getElementById("loaderContainer");
+  const infoScreenElement = document.getElementById("infoAnimContainer");
+  const infoTextElement = document.getElementById("infoText");
+  const loader = new Loader(loaderElement, infoScreenElement, infoTextElement);
+  loader.start();
+
+  // API endpoint to interact with the HandAPI
+
+  class HandDetectApi {
+    loader;
+    xhttp;
+
+    url = ""
+
+    initialLoad = true;
+
+    modes = { photo: 'PHOTO', video: 'VIDEO' };
+    #mode = 'VIDEO';
+
+
+    setMode(newMode) {
+
+      if (newMode.toLowerCase() in modes) {
+        this.#mode = newMode.toUpperCase();
+      }
+
+    }
+
+    getMode() {
+      return this.#mode;
+    }
+
+    constructor(loader, url) {
+
+      this.url = url;
+      this.xhttp = new XMLHttpRequest();
+      this.loader = loader;
+
+    }
+
+    #failCount = 10;
+
+    fail() {
+      if (this.#failCount > 0) {
+        this.#failCount -= 1;
+      }
+      return this.#failCount;
+    }
+
+
+    async detect(dataURL, landmarks) {
+      return new Promise((resolve, reject) => {
+        loader.start();
+
+        this.xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            resolve([true, JSON.parse(this.response)]);
+            // console.log(this.response);
+          }
+        };
+
+        this.xhttp.open("POST", this.url, true);
+        this.xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        let request = JSON.stringify({ image: dataURL, multiHandLandmarks: landmarks });
+        this.xhttp.send(request);
+      });
+    }
+
+  }
+
+  const canvContainer = document.getElementById("canvcontainer");
+
+  const handApi = new HandDetectApi(loader, "/api/hand");
+  async function photoModeListener() {
+    if (handApi.getMode() == handApi.modes.photo) {
+      if (handApi.initialLoad) {
+        handApi.initialLoad = false;
+        loader.closeInfoScreen();
+        // Send image to server for detection
+        let [success, result] = await handApi.detect(virtualCanvas.toDataURL(), null);
+        if (success) {
+          results = { multiHandLandmarks: result.multiHandLandmarks, multiHandedness: result.multiHandedness };
+          scaleFactor = result.scaleFactor;
+          loader.stop();
+        }
+      } else {
+        loader.showInfoScreen("Tap to try on watch");
+        handApi.initialLoad = true;
+      }
+    }
+  }
+
+  canvContainer.addEventListener('click', photoModeListener);
+  infoScreenElement.addEventListener('click', photoModeListener);
+
+  /*
+    Object for storing the mode
+  */
+
+  const modes = { photo: "PHOTO", video: "VIDEO" };
+
+  // HandAPI settings end.
+
+
+  // THREE JS settings
+
+  // Global 3D model GLTF Loader
+  const goader = new THREE.GLTFLoader();
+
+  // Draco loader
+  // Create and set the Draco loader.
+  const dracoLoader = new THREE.DRACOLoader();
+
+  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+
+  goader.setDRACOLoader(dracoLoader);
+
+  // LOAD environment map textures
+  var path = "https://threejs.org/examples/textures/cube/SwedishRoyalCastle/";
+  var format = '.jpg';
+
+  var urls = [
+    path + 'px' + format, path + 'nx' + format,
+    path + 'py' + format, path + 'ny' + format,
+    path + 'pz' + format, path + 'nz' + format
+  ];
+
+  let textureLoader = new THREE.CubeTextureLoader();
+  var envMap = textureLoader.load(urls); // callback function is optional
+
+  // video loaded
+
+  function load3DModel(modelLoaded) {
+    loader.start();
+    if (root?.name != modelLoaded.id) {
+
+      modeldata = modelLoaded;
+      // Import the glasses 
+      goader.load(modelLoaded.modelFile, (gltf) => {
+        scene.remove(root);
+        root = gltf.scene;
+        ///////////////////////
+        root.name = modelLoaded.id;
+        root.traverse((child) => {
+
+          if (child.isMesh) {
+            // console.log(child.name);
+            // var preMaterial = child.material;
+            // preMaterial.encoding = THREE.sRGBEncoding;
+            // console.log(child.material.color);
+            // color = child.material.color;
+            // child.material = glassMaterial;        
+            // child.material.color.setRGB(color.r,color.g,color.b);
+            if (child.material.isMaterial) {
+              //  console.log("material name is "+child.material.name);
+              //  console.log("Roughness is "+child.material.roughness);
+              if (child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
+              if (child.material.emissiveMap) material.emissiveMap.encoding = THREE.sRGBEncoding;
+              //  console.log(child.material.opacity);
+              let envmat = new THREE.MeshBasicMaterial({ envMap: envMap, transparent: 1, reflectivity: 1 - child.material.roughness, combine: THREE.MultiplyOperation });
+              envmat.map = child.material.map;
+              envmat.color = child.material.color;
+              envmat.opacity = child.material.opacity;
+              // child.material = envmat;
+              child.material.envMap = envMap;
+              /*
+              child.material.roughness = 0;
+              child.material.metalness = 0.3;
+              */
+              child.material.needsUpdate = true;
+            }
+            //  root.renderOrder = -root.renderOrder;
+            //  console.log(root.name);
+          }
+        });
+
+        /////////////////////
+        root.eulerOrder = "ZXY";
+        root.renderOrder = 2;
+        scene.add(root);
+      });
+    }
+    loader.stop();
+  }
+
+
+  var material = new THREE.MeshBasicMaterial({ depthTest: false });
+
+  async function createThreeScene() {
+
+    vidMaterial = new THREE.MeshPhongMaterial({ depthTest: false });
+    vidTexture = new THREE.VideoTexture(video);
+    vidMaterial.map = vidTexture;
+
+    renderer = new THREE.WebGLRenderer({
+      preserveDrawingBuffer: true,
+      alpha: false,
+      antialias: true
+    });
+
+    cameradistance = 500;
+    fieldofview = (Math.atan((deviceheight / 2) / cameradistance));
+    fieldofview = ((2 * fieldofview * 180) / Math.PI);
+
+    //Create Scene
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(fieldofview, devicewidth / deviceheight, 200, 500);
+
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setSize(devicewidth, deviceheight);
+
+    // Add the threejs scene to the DOM element
+    canvcontainer = document.getElementById("canvcontainer");
+
+    while (canvcontainer.firstChild) {
+      canvcontainer.removeChild(canvcontainer.lastChild);
+    }
+
+    renderer.domElement.id = "threejscanvas";
+    canvcontainer.appendChild(renderer.domElement);
+
+    // lights
+    //scene.add( new THREE.AmbientLight(0xFFFFFF));
+    drlight = new THREE.DirectionalLight('white', 4);
+    drlight.castShadows = false;
+    drlight.position.set(0, 55, 20);
+    scene.add(drlight);
+
+    // Load the video texture on a plane
+    const vidtexture = new THREE.CanvasTexture(virtualCanvas);
+    const geometry = new THREE.PlaneGeometry(devicewidth, deviceheight);
+    canvasMaterial = new THREE.MeshPhongMaterial({ depthTest: false });
+    canvasMaterial.map = vidtexture;
+    plane = new THREE.Mesh(geometry, canvasMaterial);
+    plane.renderOrder = 0;
+    scene.add(plane);
+
+    // Settings for 3D models
+    var modelfile = '/media/uploads/models/watch.glb';
+    var occluderfile = '/media/uploads/models/cubeoccluder.glb';
+
+    // urls for the environment map images
+    let urls = [
+      '/media/uploads/images/posx.jpg', '/media/uploads/images/negx.jpg',
+      '/media/uploads/images/posy.jpg', '/media/uploads/images/negy.jpg',
+      '/media/uploads/images/posz.jpg', '/media/uploads/images/negz.jpg'
+    ];
+
+    // Setup the environment map
+    envMap = new THREE.CubeTextureLoader().load(urls, () => {
+      envMap.format = THREE.RGBAFormat;
+    });
+
+    // Occluding sphere
+    /*    
+    omaterial = new THREE.MeshBasicMaterial({ color: 'white' });
+    oader = new THREE.GLTFLoader();
+    oader.load(occluderfile, (gltf) => {
+      occluder = gltf.scene;
+      occluder.traverse((child) => {
+        if(child.isMesh) {
+            child.material = omaterial;
+            child.renderOrder = 1;
+            child.material.colorWrite = false;
+        }
+      });
+      occluder.renderOrder = 1;
+      scene.add(occluder);
+    });
+    */
+
+    // Load the watch 3D model
+
+    load3DModel(loadedModels[0]);
+
+
+    camera.position.z = cameradistance;
+  }
+
+  var wrist;
+  var index_mcp;
+  var ring_mcp;
+  var prevAngle = 0;
+  var yAngle = 0;
+  var zAngle = 0;
+  var xAngle = 0;
+  var pinky_mcp;
+  var middle_mcp;
+  var thumb_mcp;
+  var yDiff = 0;
+  var centerx = 0;
+  var centery = 0;
+  var rotationy = 0;
+  var modelScaleFactor = 1;
+
+  // Hand detection loop function
+  let value = 0;
+
+  function normalizeToUnitCircle(center, point) {
+    // Translate the coordinates
+    let translated = {
+      x: point.x - center.x,
+      y: point.y - center.y
+    };
+
+    // Calculate the magnitude of the translated coordinates
+    let magnitude = Math.sqrt(translated.x * translated.x + translated.y * translated.y);
+
+    // Normalize the translated coordinates
+    let normalized = { x: translated.x / magnitude, y: translated.y / magnitude };
+
+    return normalized;
+  }
+
+  /*    
+  function euclid(x, y, mx, my) {
+    xsquared = (x - mx) * (x - mx);
+    ysquared = (y - my) * (y - my);
+    sum = xsquared + ysquared;
+    dist = Math.sqrt(sum);
+    dist = Math.abs(dist);
+    return dist;
+  }    
+  */
+
+  function euclid3D(x, y, z, mx, my, mz) {
+    xsquared = (x - mx) * (x - mx);
+    ysquared = (y - my) * (y - my);
+    zsquared = (z - mz) * (z - mz);
+
+    sum = xsquared + ysquared + zsquared;
+    dist = Math.sqrt(sum);
+    dist = Math.abs(dist);
+    return dist;
+  }
+
+  function calculateWristPosition(center, position, sf) {
+    let newX = position.x * sf;
+    let newY = position.y * sf;
+    newX = newX + (1 - sf) * center.x;
+    newY = newY + (1 - sf) * center.y;
+    return { x: newX, y: newY };
+  }
+
+
+
+  // Load the model
+  var results;
+  var xOffset = 0;
+  var yOffset = 0;
+  var scaleFactor = 1;
+
+  async function loadmodel() {
+
+    model = new Hands({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+      }
+    });
+
+    model.onResults((res) => {
+      results = res;
+    });
+
+    model.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 0,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    return model;
+
+  }
+
+
+  //    hands.send({ image: video });
+
+  async function animate() {
+
+    // Run the hand model
+
+    // window.removeEventListener('scroll',noScroll);
+    // PRE-PROCESSING TO DETERMINE VIDEOMODE SUPPORT AND ENSURE DETECTIONS ARE ACCURATE,
+    // ALSO AUTOMATICALLY SWITCH BETWEEN PHOTO AND VIDEO MODE
+
+    if (handApi.initialLoad && handApi.getMode() == modes.video) {
+
+      vitualCanvasCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      canvasMaterial.map.needsUpdate = true;
+      // 
+      try {
+       // throw (new Error("Video inference failed"));
+        await model.send({ image: virtualCanvas });
+
+      } catch (e) {
+
+        // Switch to photo mode ~ prompt user to tap to detect
+        if (handApi.fail() == 0) {
+          handApi.setMode("PHOTO");
+          console.log(e);
+        }
+
+      }
+
+    } else if (!handApi.initialLoad && handApi.getMode() == modes.video) {
+
+      vitualCanvasCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      canvasMaterial.map.needsUpdate = true;
+
+      try {
+        // throw(new Error("Video inference failed"))
+        await model.send({ image: virtualCanvas });
+      } catch (e) {
+        // Switch to photo mode ~ prompt user to tap to detect
+        if (handApi.fail() == 0) {
+          // handApi.setMode("PHOTO");
+          console.log(e);
+        }
+      }
+
+    } else if (handApi.initialLoad && handApi.getMode() == modes.photo) {
+      vitualCanvasCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      canvasMaterial.map.needsUpdate = true;
+      loader.showInfoScreen("Tap to try on Watch");
+      // render tap to detect
+    } else if (!handApi.initialLoad && handApi.getMode() == modes.photo) {
+    }
+
+    // loader.style.display = 'none';
+    if (results && results.multiHandLandmarks &&
+      results.multiHandLandmarks.length > 0) {
+      // console.log(initialLoad);
+
+      if (handApi.initialLoad && handApi.getMode() == modes.video) {
+        // Send landmarks for detection to calculate xoffset, yoffset, scale factor
+        let [success, result] = await handApi.detect(virtualCanvas.toDataURL(), results.multiHandLandmarks[0]);
+
+        if (success) {
+
+          scaleFactor = result.scaleFactor;
+          alert("Hand detection successful");
+         // alert("ScaleFactor "+scaleFactor);
+
+          handApi.initialLoad = false;
+          loader.closeInfoScreen();
+          loader.stop();
+
+        } else {
+          alert("Landmarks detection unsuccessful");
+        }
+        // console.log(results);         
+      }
+
+      const landmarks = results.multiHandLandmarks[0];
+      if (landmarks) {
+
+        wrist = landmarks[0];
+        ring_mcp = landmarks[5];
+        index_mcp = landmarks[13];
+        pinky_mcp = landmarks[17];
+        thumb_mcp = landmarks[1];
+        middle_mcp = landmarks[9];
+
+        centerx = (wrist.x) * devicewidth;
+        centerx = mapcoords(centerx, 0)[0];
+
+        centery = (wrist.y) * deviceheight;
+        centery = mapcoords(0, centery)[1];
+
+        let indexx = ring_mcp.x * devicewidth;
+        indexx = mapcoords(indexx,0)[0];
+        let indexy = ring_mcp.y * deviceheight;
+        indexy = mapcoords(0,indexy)[1];
+        
+        let newCenter = calculateWristPosition({x:indexx,y:indexy},{x:centerx,y:centery},scaleFactor);
+        if (results.multiHandedness) {
+          if (results.multiHandedness[0].index === 1) {
+              indexx = middle_mcp.x * devicewidth;
+              indexx = mapcoords(indexx,0)[0];
+              indexy = middle_mcp.y * deviceheight;
+              indexy = mapcoords(0,indexy)[1];
+              newCenter = calculateWristPosition({x:indexx,y:indexy},{x:centerx,y:centery},scaleFactor);
+          }else{
+              newCenter = calculateWristPosition({x:indexx,y:indexy},{x:centerx,y:centery},scaleFactor);
+          }
+        }
+        centerx = newCenter.x;
+        centery = newCenter.y;
+
+        // CALCULATE ROTATION
+        // ROTATION ALONG THE Z - AXIS
+
+        const zcoords = normalizeToUnitCircle({ x: middle_mcp.x * devicewidth, y: middle_mcp.y * deviceheight }, { x: wrist.x * devicewidth, y: wrist.y * deviceheight });
+
+        zAngle = Math.atan2(zcoords.y, zcoords.x);
+        modeldata['modelRotationZ'] = -zAngle + Math.PI / 2;
+
+        // ROTATION ALONG THE X - AXIS
+        xAngle = (wrist.y * deviceheight - middle_mcp.y * deviceheight) / (middle_mcp.z * devicewidth - wrist.z * devicewidth);
+
+        xAngle = Math.atan(xAngle) * 180 / Math.PI;
+
+        // modeldata['modelRotationX'] = xAngle*Math.PI/180;
+        const ycoords = normalizeToUnitCircle({ x: middle_mcp.x * devicewidth, y: middle_mcp.z * devicewidth }, { x: pinky_mcp.x * devicewidth, y: pinky_mcp.z * devicewidth });
+
+        yAngle = Math.atan2(ycoords.y, ycoords.x);
+
+        if (results.multiHandedness) {
+          if (results.multiHandedness[0].index === 1) {
+              yAngle = yAngle - 180 / (Math.PI * 2);
+          }
+        }
+
+        modeldata['modelRotationY'] = yAngle;
+
+        // set scale factor
+        modelScaleFactor = euclid3D(wrist.x * devicewidth, wrist.y * deviceheight, wrist.z * devicewidth, middle_mcp.x * devicewidth, middle_mcp.y * deviceheight, middle_mcp.z * devicewidth);
+
+        // console.log(modelScaleFactor);
+        if (root != undefined) {
+          root.position.set(centerx, centery, plane.position.z);
+          root.scale.set(modeldata['modelScaleX'] * modelScaleFactor, modeldata['modelScaleY'] * modelScaleFactor, modeldata['modelScaleZ'] * modelScaleFactor);
+          root.rotation.set(modeldata['modelRotationX'], modeldata['modelRotationY'], modeldata['modelRotationZ']);
+        }
+      }
+
+    }
+
+    // stats.end();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+
+  }
+  async function setup() {
+
+    video = document.getElementById('video');
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      'audio': false,
+      'video': {
+        facingMode: 'user'
+      },
+    });
+
+    video.srcObject = stream;
+
+    video.muted = true;
+
+    video.play();
+
+    video.onloadedmetadata = async () => {
+
+      vidloaded = true;
+
+      aspectRatio = video.videoWidth / video.videoHeight;
+      devicewidth = ((window.innerWidth > 0) ? window.innerWidth : screen.width) * deviceRatio;
+      deviceheight = devicewidth / aspectRatio;
+
+      // Create a virtual canvas
+      virtualCanvas = document.createElement('canvas');
+      virtualCanvas.width = video.videoWidth;
+      virtualCanvas.height = video.videoHeight;
+      vitualCanvasCtx = virtualCanvas.getContext("2d");
+      //vitualCanvasCtx.scale(-1, 1);
+      vitualCanvasCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+      // INITALIZE THREE JS ENVIRONMENT
+      await createThreeScene();
+
+
+      // Take photo functionality
+      const cameraIcon = document.getElementById('camera-icon');
+
+      cameraIcon.addEventListener('click', function (e) {
+        downloadCanvas();
+      });
+
+
+      // Load the model and then initialize rendering loop    
+      await loadmodel();
+      loader.stop();
+      loader.showInfoScreen("Align Hand for detection");
+      animate();
+
+
+    };
+  }
+
+  // Download canvas image button
+
+  async function downloadCanvas() {
+
+    // get canvas data 
+    const threeCanvas = document.getElementById("threejscanvas");
+    //   const tempCanvas = document.createElement('canvas');
+
+    // const tempCanvasContext = tempCanvas.getContext('2d');
+    let base64image;
+
+    const tempCanvas = await html2canvas(threeCanvas);
+    base64image = tempCanvas.toDataURL();
+
+    /*
+    
+        tempCanvasContext.drawImage(threeCanvas,0,0,threeCanvas.width,threeCanvas.height);
+    //  tempCanvasContext.translate(threeCanvas.width, 0);
+    //  tempCanvasContext.scale(-1, 1);
+    
+    */
+    const currTime = Date.now();
+
+    console.log(base64image);
+    var tmpLink = document.createElement('a');
+    tmpLink.download = `img-${currTime}`;
+
+    tmpLink.href = base64image;
+
+    // temporarily add link to body and initiate the download  
+    document.body.appendChild(tmpLink);
+    tmpLink.click();
+    document.body.removeChild(tmpLink);
+
+  }
+
+  setup();
+
+</script>
+
+</html>

@@ -1,0 +1,66 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Cart | {% endblock %}
+
+{% block content %}
+    <h1 class="title">Cart</h1>
+    {% if cart %}
+        <div class="box mb-6">
+            <div class="table">
+                <table class="table is-fullwidth is-striped">
+                    <thead>
+                        <th></th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th></th>
+                    </thead>
+
+                    <tbody>
+                        {% for item in cart %}
+                            <tr>
+                                <td>
+                                    <figure class="image is-64x64">
+                                        <img src="{{ item.product.get_thumbnail }}">
+                                    </figure>
+                                </td>
+                                <td>
+                                    <a href="{% url 'product' item.product.category.slug item.product.slug %}">{{ item.product.title }}</a>
+                                </td>
+                                <td>
+                                    {{ item.quantity }}
+                                    <a href="?change_quantity={{ item.id }}&quantity=-1">-</a>
+                                    <a href="?change_quantity={{ item.id }}&quantity=1">+</a>
+                                </td>
+                                <td>${{ item.total_price }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                   Order Via WhatsApp  
+                                </td>
+                                <td>
+                                    <a href="https://wa.me/+2547{{item.product.vendor.contact}}?text=Hi%20is%20this%20pair%20available%20,%20Quantity%20{{item.quantity}}%20https://pima.co.ke{% url 'product' item.product.category.slug item.product.slug %}" style='text-align:center;'><img width='50x' height='50px' src='{% static "/images/whatsapplogo.svg" %}'/></a>
+                                </td>
+                            
+                                <td>
+                                    <td><a href="?remove_from_cart={{ item.id }}" class="delete">Remove</a></td>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td><strong>Total cost</strong></td>
+                            <td><strong>{{ cart|length}}</strong></td>
+                            <td colspan="2"><strong>${{ cart.get_total_cost }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <p>You don't have any products in your cart!</p>
+    {% endif %}
+{% endblock %}
